@@ -1,4 +1,6 @@
 lista_tareas = [] # Definición de lista vacía adónde se guardarán las tareas. 
+def pause():
+    input("\nPresiona Enter volver al menu...") 
 
 # Esta lista almacenará las tareas del usuario.
 # Cada tarea será un diccionario con los siguientes campos:
@@ -57,6 +59,7 @@ def ver_tareas(): # Definición de función para ver todas las tareas
     # Primero verificamos si hay tareas
     if not lista_tareas:
         print("\n📝 No hay tareas en la lista.")
+        pause()
         return
     
     print(f"\n📋 LISTA DE TAREAS ({len(lista_tareas)} tareas)")
@@ -77,6 +80,74 @@ def ver_tareas(): # Definición de función para ver todas las tareas
             print(f"   Fecha límite: {tarea['fecha_limite']}")
         
         print("-" * 30)
+    else: pause()
+
+def modificar_tarea(): # Definición de función para modificar una tarea existente
+    """Modifica una tarea existente en la lista"""
+    
+        # Verificar si hay tareas
+    if not lista_tareas:
+        print("\n📝 No hay tareas para modificar.")
+        pause()
+        return
+    
+    # Mostrar tareas disponibles
+    print(f"\n{len(lista_tareas)} TAREAS DISPONIBLES:")
+    for tarea in lista_tareas:
+        estado = "✅" if tarea['completada'] else "⏳"
+        print(f"{estado} ID: {tarea['id']} - {tarea['titulo']}")
+    
+    # Pedir el ID de la tarea a modificar
+    try:
+        id_buscar = int(input("\nIngresa el ID de la tarea a modificar: "))
+    except ValueError:
+        print("\n❌ Por favor ingresa un número válido.")
+        return
+    
+    # Buscar la tarea
+    tarea_encontrada = None
+    for tarea in lista_tareas:
+        if tarea['id'] == id_buscar:
+            tarea_encontrada = tarea
+            break
+    
+    if not tarea_encontrada:
+        print("\n❌ No se encontró una tarea con ese ID.")
+        return
+    
+    # Mostrar opciones de modificación
+    print(f"\n🔧 Modificando tarea: {tarea_encontrada['titulo']}")
+    print("¿Qué deseas modificar?")
+    print("1. Título")
+    print("2. Descripción")
+    print("3. Marcar como completada/pendiente")
+    print("4. Fecha límite")
+    
+    opcion = input("\nSelecciona una opción (1-4): ")
+    
+    if opcion == "1":
+        nuevo_titulo = input("\nNuevo título: ")
+        tarea_encontrada['titulo'] = nuevo_titulo
+        print("\n✅ Título actualizado!")
+        pause()
+    elif opcion == "2":
+        nueva_descripcion = input("\nNueva descripción: ")
+        tarea_encontrada['descripcion'] = nueva_descripcion
+        print("\n✅ Descripción actualizada!")
+        pause()
+    elif opcion == "3":
+        tarea_encontrada['completada'] = not tarea_encontrada['completada']
+        estado_nuevo = "completada" if tarea_encontrada['completada'] else "pendiente"
+        print(f"\n✅ Tarea marcada como {estado_nuevo}!")
+        pause()
+    elif opcion == "4":
+        nueva_fecha = input("\nNueva fecha límite (YYYY-MM-DD) o Enter para quitar: ")
+        tarea_encontrada['fecha_limite'] = nueva_fecha if nueva_fecha else None
+        print("\n✅ Fecha límite actualizada!")
+        pause()
+    else:
+        print("\n❌ Opción inválida.")
+        pause()
 
 def main(): # Definición de la función principal
     """Función principal del programa"""
@@ -89,9 +160,9 @@ def main(): # Definición de la función principal
             agregar_tarea() # Llamar a la función para agregar una tarea
         elif opcion == "2":
             ver_tareas() # Llamar a la función para ver todas las tareas
-            pause = input("\nPresiona Enter volver al menu...") # Pausa para que el usuario vea las tareas
+             # Pausa para que el usuario vea las tareas
         elif opcion == "3":
-            print("\nFunción modificar tarea - por implementar")
+            modificar_tarea() # Llamar a la función para modificar una tarea
         elif opcion == "4":
             print("\nFunción eliminar tarea - por implementar")
         elif opcion == "5":
