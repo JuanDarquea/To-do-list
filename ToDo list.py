@@ -57,12 +57,13 @@ def ver_tareas(): # Definición de función para ver todas las tareas
     """Muestra todas las tareas en la lista"""
     #global lista_tareas  # Necesitamos acceder a la lista global
     # Primero verificamos si hay tareas
-    if not lista_tareas:
+    if not lista_tareas: # Si la lista está vacía
+        # Mostramos un mensaje y salimos
         print("\n📝 No hay tareas en la lista.")
         pause()
         return
-    
-    print(f"\n📋 LISTA DE TAREAS ({len(lista_tareas)} tareas)")
+    # Si hay tareas, mostramos el encabezado
+    print(f"\n📋 LISTA DE TAREAS ({len(lista_tareas)} tareas)") # Encabezado: utiliza la función `len` para dar un conteo de las tareas totales. 
     print("=" * 50)
     
     # Recorremos cada tarea y la mostramos
@@ -80,7 +81,7 @@ def ver_tareas(): # Definición de función para ver todas las tareas
             print(f"   Fecha límite: {tarea['fecha_limite']}")
         
         print("-" * 30)
-    else: pause()
+    else: pause() # Pausa agregada al final del if. 
 
 def modificar_tarea(): # Definición de función para modificar una tarea existente
     """Modifica una tarea existente en la lista"""
@@ -89,10 +90,10 @@ def modificar_tarea(): # Definición de función para modificar una tarea existe
     if not lista_tareas:
         print("\n📝 No hay tareas para modificar.")
         pause()
-        return
+        return # Si no hay tareas, regresamos al main. 
     
     # Mostrar tareas disponibles
-    print(f"\n{len(lista_tareas)} TAREAS DISPONIBLES:")
+    print(f"\n{len(lista_tareas)} TAREAS DISPONIBLES:") #Encabezado de lista de tareas disponibles con un contador de cuántas tareas tiene. 
     for tarea in lista_tareas:
         estado = "✅" if tarea['completada'] else "⏳"
         print(f"{estado} ID: {tarea['id']} - {tarea['titulo']}")
@@ -139,7 +140,7 @@ def modificar_tarea(): # Definición de función para modificar una tarea existe
         tarea_encontrada['completada'] = not tarea_encontrada['completada']
         estado_nuevo = "completada" if tarea_encontrada['completada'] else "pendiente"
         print(f"\n✅ Tarea marcada como {estado_nuevo}!")
-        pause()
+        #pause()
     elif opcion == "4":
         nueva_fecha = input("\nNueva fecha límite (YYYY-MM-DD) o Enter para quitar: ")
         tarea_encontrada['fecha_limite'] = nueva_fecha if nueva_fecha else None
@@ -147,7 +148,62 @@ def modificar_tarea(): # Definición de función para modificar una tarea existe
         pause()
     else:
         print("\n❌ Opción inválida.")
+        #pause()
+
+def eliminar_tarea(): # Definición de función para eliminar una tarea existente
+    """Elimina una tarea de la lista"""
+    
+    # Verificar si hay tareas
+    if not lista_tareas: # Si la lista está vacía
+        # Mostrar mensaje y regresar
+        print("\n📝 No hay tareas para eliminar.")
         pause()
+        return
+    
+    # Mostrar tareas disponibles
+    print(f"\n📋{len(lista_tareas)} TAREAS DISPONIBLES:") 
+    for tarea in lista_tareas: # Recorremos la lista de tareas
+        estado = "✅" if tarea['completada'] else "⏳" # Determinamos el estado de la tarea
+        print(f"{estado} ID: {tarea['id']} - {tarea['titulo']}") # Mostramos el ID y el título de cada tarea
+    
+    # Pedir el ID de la tarea a eliminar
+    try: # Intentar convertir la entrada a entero
+        # Pedir al usuario el ID de la tarea a eliminar
+        id_eliminar = int(input("\nIngresa el ID de la tarea a eliminar: ")) # Convertir a entero
+    except ValueError: # Si ocurre un error de conversión
+        # Mostrar mensaje de error y regresar
+        print("\n❌ Por favor ingresa un número válido.")
+        return
+    
+    # Buscar la tarea
+    tarea_a_eliminar = None # Inicializar variable para almacenar la tarea a eliminar
+    # Inicializar el índice de la tarea a eliminar
+    indice_tarea = -1 # Inicializar el índice de la tarea a eliminar como -1
+    
+    for i, tarea in enumerate(lista_tareas): # Recorremos la lista de tareas con su índice
+        if tarea['id'] == id_eliminar: # Si encontramos la tarea con el ID proporcionado
+            # Asignamos la tarea a eliminar y su índice
+            tarea_a_eliminar = tarea # Guardamos la tarea encontrada
+            indice_tarea = i # Guardamos el índice de la tarea encontrada
+            break
+    
+    if not tarea_a_eliminar: # Si no se encontró la tarea
+        # Mostrar mensaje de error y regresar
+        print("\n❌ No se encontró una tarea con ese ID.")
+        return
+    
+    # Confirmar eliminación
+    print(f"\n⚠️  ¿Estás seguro de que quieres eliminar la tarea:")
+    print(f"   '{tarea_a_eliminar['titulo']}'?")
+    # Pedimos confirmación al usuario
+    print("   Esta acción no se puede deshacer.")
+    confirmacion = input("\nEscribe 'si' para confirmar: ").lower() # Convertimos la entrada a minúsculas para evitar errores de mayúsculas/minúsculas
+    
+    if confirmacion == 'si': # Si el usuario confirma la eliminación
+        lista_tareas.remove(tarea_a_eliminar) # Eliminamos la tarea de la lista
+        print(f"\n✅ Tarea '{tarea_a_eliminar['titulo']}' eliminada correctamente!")
+    else: # Si el usuario no confirma la eliminación
+        print("\n❌ Eliminación cancelada.")
 
 def main(): # Definición de la función principal
     """Función principal del programa"""
@@ -160,11 +216,10 @@ def main(): # Definición de la función principal
             agregar_tarea() # Llamar a la función para agregar una tarea
         elif opcion == "2":
             ver_tareas() # Llamar a la función para ver todas las tareas
-             # Pausa para que el usuario vea las tareas
         elif opcion == "3":
             modificar_tarea() # Llamar a la función para modificar una tarea
         elif opcion == "4":
-            print("\nFunción eliminar tarea - por implementar")
+            eliminar_tarea() # Llamar a la función para eliminar una tarea
         elif opcion == "5":
             print("\nSaliendo del programa...") # Mensaje de salida
             # Aquí podríamos guardar las tareas en un archivo si quisieramos persistencia
@@ -172,7 +227,7 @@ def main(): # Definición de la función principal
             print("¡Hasta luego!\n")
             break # Salir del bucle y terminar el programa
         else:
-            print("Opción inválida. Intenta de nuevo.") # Mensaje de error si la opción no es válida
+            print("\nOpción inválida. Intenta de nuevo.") # Mensaje de error si la opción no es válida
 
 # Ejecutar el programa
 if __name__ == "__main__": # Comprobar si el script se está ejecutando directamente
