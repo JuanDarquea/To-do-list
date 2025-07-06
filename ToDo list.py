@@ -1,4 +1,7 @@
+import json
 lista_tareas = [] # Definición de lista vacía adónde se guardarán las tareas. 
+contador_id = 1
+
 def pause():
     input("\nPresiona Enter volver al menu...") 
 
@@ -205,8 +208,50 @@ def eliminar_tarea(): # Definición de función para eliminar una tarea existent
     else: # Si el usuario no confirma la eliminación
         print("\n❌ Eliminación cancelada.")
 
+def cargar_tareas(): # Definición de variable cargar tareas al archivo JSON
+    """Carga las tareas desde el archivo JSON"""
+    global lista_tareas, contador_id # Necesitamos modificar estas variables globalmente
+    
+    try: # Intentamos abrir el archivo JSON
+        with open("tareas.json", "r", encoding="utf-8") as archivo: # Abrimos el archivo en modo lectura
+            lista_tareas = json.load(archivo) # Cargamos las tareas desde el archivo
+            
+            # Calcular el siguiente ID disponible
+            if lista_tareas:
+                contador_id = max(tarea['id'] for tarea in lista_tareas) + 1 # Encontramos el ID máximo y le sumamos 1
+            else:
+                contador_id = 1 # Si la lista está vacía, comenzamos desde 1
+                
+            print(f"\n✅ Se cargaron {len(lista_tareas)} tareas del archivo.") 
+            
+    except FileNotFoundError: # Si el archivo no existe
+        # Mostramos un mensaje y comenzamos con una lista vacía
+        print("\n📝 No se encontró archivo previo. Empezando con lista vacía.")
+        lista_tareas = []
+        contador_id = 1
+        
+    except json.JSONDecodeError: # Si el archivo JSON está corrupto
+        # Mostramos un mensaje de error y comenzamos con una lista vacía
+        print("\n❌ El archivo está corrupto. Empezando con lista vacía.")
+        lista_tareas = []
+        contador_id = 1
+
+def guardar_tareas(): # Definición de función para guardar las tareas en un archivo JSON
+    """Guarda las tareas en el archivo JSON"""
+    try: # Intentamos abrir el archivo JSON en modo escritura
+        with open("tareas.json", "w", encoding="utf-8") as archivo: # Abrimos el archivo en modo escritura
+            json.dump(lista_tareas, archivo, indent=2, ensure_ascii=False) # Guardamos las tareas en formato JSON con indentación de 2 espacios y sin codificar caracteres especiales
+        # Si todo sale bien, mostramos un mensaje de éxito
+        print("\n💾 Tareas guardadas correctamente.") 
+        
+    except Exception as e: # Si ocurre un error al guardar
+        # Mostramos un mensaje de error
+        print(f"\n❌ Error al guardar: {e}")
+
 def main(): # Definición de la función principal
     """Función principal del programa"""
+    cargar_tareas() # Cargar las tareas desde el archivo JSON al iniciar el programa
+
     while True: # Bucle infinito para mantener el programa en ejecución
         mostrar_menu()
         opcion = input("Selecciona una opción (1-5): ")
@@ -214,12 +259,15 @@ def main(): # Definición de la función principal
         if opcion == "1":
             print("\nAgregar tarea\n") 
             agregar_tarea() # Llamar a la función para agregar una tarea
+            guardar_tareas() # Guardar las tareas después de agregar una nueva
         elif opcion == "2":
             ver_tareas() # Llamar a la función para ver todas las tareas
         elif opcion == "3":
             modificar_tarea() # Llamar a la función para modificar una tarea
+            guardar_tareas() # Guardar las tareas después de modificar una  
         elif opcion == "4":
             eliminar_tarea() # Llamar a la función para eliminar una tarea
+            guardar_tareas() # Guardar las tareas después de eliminar una
         elif opcion == "5":
             print("\nSaliendo del programa...") # Mensaje de salida
             # Aquí podríamos guardar las tareas en un archivo si quisieramos persistencia
